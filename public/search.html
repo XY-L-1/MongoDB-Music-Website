@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="style.css">
+        <title>Search By Genre</title>
+        <style>
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                border: 1px solid black;
+            }
+
+            th, td {
+                border: 1px solid black;
+                padding: 8px;
+                text-align: left;
+            }
+
+            tr:nth-child(even) {background-color: #f2f2f2;}
+
+            #searchBtn {
+                background-color: green;
+                color: white;
+                border: none;
+                padding: 5px 10px;
+                cursor: pointer;
+            }
+
+            #searchBtn:hover {
+                color: black;
+                border: hidden;
+                padding: 5px 10px;
+                cursor: pointer;
+            }
+        </style>
+    </head>
+
+    <body>
+        <header>
+            <!-- navigation links to other pages -->
+            <nav>
+                <h1>Music Services</h1>
+                <ul>
+                    <li>
+                        <a href="songs.html">Main Page</a>
+                    </li>
+
+                    <li> 
+                        <a href="addSong.html">Add a Song</a>
+                    </li>
+    
+                    <li>
+                        <a href="updateSong.html">Update a Song</a>
+                    </li>
+    
+                    <li>
+                        <a href="deleteSong.html">Delete a Song</a>
+                    </li>
+    
+                    <li>
+                        <a href="search.html">Search by Genre</a>
+                    </li>
+    
+                    <li>
+                        <a href="listSongs.html"> List all Songs</a>
+                    </li>
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+            <h1>Search By Genre</h1>
+            <select id="genreDropDown">
+                <option value="rock">Rock</option>
+                <option value="pop">Pop</option>
+                <option value="pop punk">Pop punk</option>
+            </select>
+
+            <input type="button" value="Search" id="searchBtn">
+            <div id="songList">
+
+            </div>
+
+            <div id="error">
+
+            </div>
+        </main>
+        <footer>
+            <p><i>&copy; 2023 The Music Company - created by Xiaoyu Luo</i></p>
+        </footer>
+
+    </body>
+
+    <script>
+        addEventListener("DOMContentLoaded", async function() {
+            document.querySelector("#searchBtn").addEventListener("click", searchByGenre);
+            getAllGenre();
+        });
+
+        // First get all the genres in the database, so that user could choose one
+        // from these options. 
+        async function getAllGenre(){
+            const response = await fetch('/api/songs');
+            if(response.ok){
+                const all_songs = await response.json();
+                let genres = [];
+                let html="";
+                for(let song of all_songs){
+                    for(let gr of song.genre){
+                        gr = gr.trim();
+                        if(!genres.includes(gr)){
+                            genres.push(gr);
+                            html += `<option value="${gr}">${gr}</option>`; 
+                        }
+                    }
+                }
+
+                document.querySelector("#genreDropDown").innerHTML=html;
+            }
+        }
+
+        // Create a dropdown menu for users to choose a genre, and make the 
+        // webpage only shows songs related to that genre.
+        async function searchByGenre(){
+            const genre = document.querySelector("#genreDropDown option:checked").value.trim();
+            const response = await fetch("/api/songs/genre/" + genre, {
+                method: "GET"
+            });
+            const songs = await response.json();
+
+            let html = `
+                <table id='t01'>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Artist</th>
+                        <th>Popularity</th>
+                        <th>Genre</th>
+                    </tr>
+            `;
+            
+            for(let song of songs){
+                html += `
+                <tr>
+                    <td>${song._id}</td>
+                    <td>${song.title}</td>
+                    <td>${song.artist}</td>
+                    <td>${song.popularity}</td>
+                    <td>${song.genre}</td>
+                </tr>
+                `;
+            }
+            document.querySelector("#songList").innerHTML = html;
+            return;
+        }
+
+    </script>
+</html>

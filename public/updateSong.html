@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="style.css">
+        <title>Update Song</title>
+        <style>
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                border: 1px solid black;
+            }
+
+            th, td {
+                border: 1px solid black;
+                padding: 8px;
+                text-align: left;
+            }
+
+            tr:nth-child(even) {background-color: aliceblue;}
+        </style>
+    </head>
+
+    <body>
+        <header>
+            <!-- navigation links to other pages -->
+            <nav>
+                <h1>Music Services</h1>
+                <ul>
+                    <li>
+                        <a href="songs.html">Main Page</a>
+                    </li>
+
+                    <li> 
+                        <a href="addSong.html">Add a Song</a>
+                    </li>
+    
+                    <li>
+                        <a href="updateSong.html">Update a Song</a>
+                    </li>
+    
+                    <li>
+                        <a href="deleteSong.html">Delete a Song</a>
+                    </li>
+    
+                    <li>
+                        <a href="search.html">Search by Genre</a>
+                    </li>
+    
+                    <li>
+                        <a href="listSongs.html"> List all Songs</a>
+                    </li>
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+            <h1>Update a Song</h1>
+            <table id="songsTable">
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Artist</th>
+                    <th>Released</th>
+                    <th>Popularity</th>
+                    <th>Genre</th>
+                    <th>Action</th>
+                </tr>
+            </table>
+
+            <form id="updateSongForm" style="display:none">
+                <h2>Update Song</h2>
+                <input type="hidden" id="updateSongId">
+                <label>Title:</label>
+                <input type="text" id="updateSongTitle" required>
+                <label>Artist:</label>
+                <input type="text" id="updateSongArtist" required>
+                <label>Released:</label>
+                <input type="date" id="updateSongReleased" required>
+                <label>Popularity:</label>
+                <input type="text" id="updateSongPopularity" required>
+                <label>Genre:</label>
+                <input type="text" id="updateSongGenre" required>
+                <input type="submit" value="Update Song">
+            </form>
+        </main>
+        <footer>
+            <p><i>&copy; 2023 The Music Company - created by Xiaoyu Luo</i></p>
+        </footer>
+
+    </body>
+
+    <script>
+        const updateSongForm = document.getElementById('updateSongForm');
+        
+        addEventListener("DOMContentLoaded", async function() {
+            const response = await fetch("/api/songs/");
+            const songs = await response.json();
+
+            const table = document.getElementById("songsTable");
+
+            // Display all songs first
+            songs.forEach(song => {
+                const releaseDate = new Date(song.releaseDate);
+                const formattedDate = (releaseDate.getMonth() + 1) + '/' + releaseDate.getDate() + '/' + releaseDate.getFullYear();
+
+                const row = table.insertRow();
+                row.innerHTML = `
+                    <td>${song._id}</td>
+                    <td>${song.title}</td>
+                    <td>${song.artist}</td>
+                    <td>${formattedDate}</td>
+                    <td>${song.popularity}</td>
+                    <td>${song.genre}</td>
+                    <td><button class="updateBtn">Update</button></td>
+                `;
+                const updateBtn = row.querySelector('.updateBtn');
+
+                // Make the updateBtn able to update a song
+                updateBtn.addEventListener('click', async () => {
+                    updateSongForm.style.display = 'block';
+
+                    // Populate the form fields with the song data
+                    document.getElementById('updateSongId').value = song._id;
+                    document.getElementById('updateSongTitle').value = song.title;
+                    document.getElementById('updateSongArtist').value = song.artist;
+                    const releaseDate = new Date(song.releaseDate);
+                    const formattedReleaseDate = releaseDate.toISOString().split('T')[0];
+                    document.getElementById('updateSongReleased').value = formattedReleaseDate;
+                    document.getElementById('updateSongPopularity').value = song.popularity;
+                    document.getElementById('updateSongGenre').value = song.genre.join(',');
+                });
+
+                updateSongForm.addEventListener('submit', async event => {
+                event.preventDefault();  // Prevent page from refreshing
+
+                // Get updated song data from form fields
+                const updatedSong = {
+                    _id: document.getElementById('updateSongId').value,
+                    title: document.getElementById('updateSongTitle').value,
+                    artist: document.getElementById('updateSongArtist').value,
+                    releaseDate: document.getElementById('updateSongReleased').value,
+                    popularity: document.getElementById('updateSongPopularity').value,
+                    genre: document.getElementById('updateSongGenre').value ?
+                    document.getElementById('updateSongGenre').value.split(","): []
+                };
+
+                // Send PUT request to server
+                const response = await fetch(`/api/songs/${updatedSong._id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updatedSong)
+                });
+
+                if (response.ok) {
+                    // Hide the form and refresh the songs list
+                    updateSongForm.style.display = 'none';
+                    location.reload();
+                }
+            });
+
+            });
+        })
+    </script>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Music Songs</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link rel='stylesheet' href='style.css'>
+</head>
+
+<body>
+    <header>
+        <!-- navigation links to other pages -->
+        <nav>
+            <h1>Music Services</h1>
+            <ul>
+                <li>
+                    <a href="songs.html">Main Page</a>
+                </li>
+
+                <li> 
+                    <a href="addSong.html">Add a Song</a>
+                </li>
+
+                <li>
+                    <a href="updateSong.html">Update a Song</a>
+                </li>
+
+                <li>
+                    <a href="deleteSong.html">Delete a Song</a>
+                </li>
+
+                <li>
+                    <a href="search.html">Search by Genre</a>
+                </li>
+
+                <li>
+                    <a href="listSongs.html"> List all Songs</a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h1>Song Catalog - Select from the menu above</h1>
+        <div id = "list">
+            <h1>Songs</h1>
+            <ul>
+            
+            </ul>
+        </div>
+    </main>
+
+    <footer>
+        <p><i>&copy; 2023 The Music Company - created by Xiaoyu Luo</i></p>
+    </footer>
+</body>
+<script>
+    // Load the songs in an unordered list form
+addEventListener("DOMContentLoaded", async function() {
+    const response = await fetch("/api/songs/");
+    const songs = await response.json();
+     
+    // Initialize an empty string to store the HTML content
+    let html = "";
+
+    // Iterate over each song in the "songs" array
+    for (let song of songs) {
+        html += `<li>${song.title} - ${song.artist}</li>`;
+    }
+
+    document.getElementById("list").innerHTML = html;
+    });
+</script>
+
+</html>

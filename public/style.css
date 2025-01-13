@@ -1,0 +1,32 @@
+nav ul {
+    background-color: gray;
+    padding: 10px 0;
+    font-size: 21px;
+    text-align: center;
+}
+
+nav li{
+    display: inline;
+    border-right: 1px solid white;
+    align-content: space-evenly;
+}
+
+nav a {
+    padding:17px;
+    position: relative;
+}
+
+nav a:not(:last-child) {
+    background-color: aliceblue;
+    border-right: 3px solid white;
+  }
+
+nav a.active {
+    color:inherit;
+}
+
+nav a:hover {
+    border: 3px solid red;
+    color: aqua;
+}
+

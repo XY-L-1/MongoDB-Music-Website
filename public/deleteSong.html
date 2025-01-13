@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="style.css">
+        <title>Delete Songs</title>
+        <style>
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                border: 1px solid black;
+            }
+
+            th, td {
+                border: 1px solid black;
+                padding: 8px;
+                text-align: left;
+            }
+
+            tr:nth-child(even) {background-color: #f2f2f2;}
+
+            .deleteBtn {
+                background-color: green;
+                color: white;
+                border: none;
+                padding: 5px 10px;
+                cursor: pointer;
+            }
+
+            .deleteBtn:hover{
+                border:3px solid;
+                color:blueviolet;
+            }
+        </style>
+    </head>
+
+    <body>
+        <header>
+            <!-- navigation links to other pages -->
+            <nav>
+                <h1>Music Services</h1>
+                <ul>
+                    <li>
+                        <a href="songs.html">Main Page</a>
+                    </li>
+
+                    <li> 
+                        <a href="addSong.html">Add a Song</a>
+                    </li>
+    
+                    <li>
+                        <a href="updateSong.html">Update a Song</a>
+                    </li>
+    
+                    <li>
+                        <a href="deleteSong.html">Delete a Song</a>
+                    </li>
+    
+                    <li>
+                        <a href="search.html">Search by Genre</a>
+                    </li>
+    
+                    <li>
+                        <a href="listSongs.html"> List all Songs</a>
+                    </li>
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+            <h1>Delete a Song</h1>
+            <table id="songsTable">
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Artist</th>
+                    <th>Released</th>
+                    <th>Popularity</th>
+                    <th>Genre</th>
+                    <th>Action</th>
+                </tr>
+            </table>
+        </main>
+        <footer>
+            <p><i>&copy; 2023 The Music Company - created by Xiaoyu Luo</i></p>
+        </footer>
+
+    </body>
+
+    <script>
+        addEventListener("DOMContentLoaded", async function() {
+            const response = await fetch("/api/songs/");
+            const songs = await response.json();
+
+            const table = document.getElementById('songsTable');
+
+            // load all songs into a table
+            songs.forEach(song => {
+                const releaseDate = new Date(song.releaseDate);
+                const formattedDate = (releaseDate.getMonth() + 1) + '/' + releaseDate.getDate() + '/' + releaseDate.getFullYear();
+
+                const row = table.insertRow();
+                row.innerHTML = `
+                    <td>${song._id}</td>
+                    <td>${song.title}</td>
+                    <td>${song.artist}</td>
+                    <td>${formattedDate}</td>
+                    <td>${song.popularity}</td>
+                    <td>${song.genre}</td>
+                    <td><button class="deleteBtn">Delete</button></td>
+                `;
+                const deleteBtn = row.querySelector('.deleteBtn');
+
+                // Make the delete button able to delete a song 
+                deleteBtn.addEventListener('click', async () => {
+                    const response = await fetch(`/api/songs/${song._id}`, {
+                        method: 'DELETE',
+                    });
+                    if (response.ok) {
+                        // Reset the table after adding the song
+                        location.reload();
+                    } else {
+                        alert('Failed to delete song');
+                    }
+                });
+            });
+        });
+    </script>
+</html>

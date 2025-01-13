@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="style.css">
+        <title>List All Songs</title>
+        <style>
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                border: 1px solid black;
+            }
+
+            th, td {
+                border: 1px solid black;
+                padding: 8px;
+                text-align: left;
+            }
+
+            tr:nth-child(even) {background-color: aliceblue;}
+        </style>
+    </head>
+
+    <body>
+        <header>
+            <!-- navigation links to other pages -->
+            <nav>
+                <h1>Music Services</h1>
+                <ul>
+                    <li>
+                        <a href="songs.html">Main Page</a>
+                    </li>
+
+                    <li> 
+                        <a href="addSong.html">Add a Song</a>
+                    </li>
+    
+                    <li>
+                        <a href="updateSong.html">Update a Song</a>
+                    </li>
+    
+                    <li>
+                        <a href="deleteSong.html">Delete a Song</a>
+                    </li>
+    
+                    <li>
+                        <a href="search.html">Search by Genre</a>
+                    </li>
+    
+                    <li>
+                        <a href="listSongs.html"> List all Songs</a>
+                    </li>
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+            <h1>List of All Songs</h1>
+            <table id="songsTable">
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Artist</th>
+                    <th>Released</th>
+                    <th>Popularity</th>
+                    <th>Genre</th>
+                </tr>
+            </table>
+        </main>
+        <footer>
+            <p><i>&copy; 2023 The Music Company - created by Xiaoyu Luo</i></p>
+        </footer>
+
+    </body>
+
+    <script>
+        addEventListener("DOMContentLoaded", async function() {
+            //fetch data from the "/api/songs/"
+            const response = await fetch("/api/songs/");
+            const songs = await response.json();
+
+            // Select the HTML element with the ID "songsTable"    
+            const table = document.getElementById('songsTable');
+
+             // Iterate over each song in the "songs" array
+            songs.forEach(song => {
+                const releaseDate = new Date(song.releaseDate);
+                const formattedDate = (releaseDate.getMonth() + 1) + '/' + releaseDate.getDate() + '/' + releaseDate.getFullYear();
+
+                const row = table.insertRow();
+                row.innerHTML = `
+                    <td>${song._id}</td>
+                    <td>${song.title}</td>
+                    <td>${song.artist}</td>
+                    <td>${formattedDate}</td>
+                    <td>${song.popularity}</td>
+                    <td>${song.genre}</td>
+                `;
+            });
+            });
+        </script>
+</html>
